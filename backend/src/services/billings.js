@@ -9,19 +9,37 @@ const stream = require('stream');
 
 module.exports = class BillingsService {
   static async create(data, currentUser) {
-    const transaction = await db.sequelize.transaction();
-    try {
-      await BillingsDBApi.create(data, {
-        currentUser,
-        transaction,
+  const transaction = await db.sequelize.transaction();
+  try {
+    // If patientId is provided, fetch prescriptions and calculate total prescription cost
+    if (data.patientId) {
+      const prescriptions = await getPrescriptionsForPatient(data.patientId);
+      data.prescriptions = prescriptions;
+      let prescriptionTotal = 0;
+      // Sum the amounts from each prescription
+      prescriptions.forEach(prescription => {
+        if (prescription.amount) {
+          prescriptionTotal += Number(prescription.amount);
+        }
       });
 
-      await transaction.commit();
-    } catch (error) {
-      await transaction.rollback();
-      throw error;
+      // Get the original bill amount (if available) and calculate total amount
+      const originalBillAmount = data.amount ? Number(data.amount) : 0;
+      data.totalAmount = originalBillAmount + prescriptionTotal;
     }
+
+    const createdBilling = await BillingsDBApi.create(data, {
+      currentUser,
+      transaction,
+    });
+
+    await transaction.commit();
+    return createdBilling;
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
   }
+}
 
   static async bulkImport(req, res, sendInvitationEmails = true, host) {
     const transaction = await db.sequelize.transaction();
