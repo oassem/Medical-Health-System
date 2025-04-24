@@ -15,7 +15,7 @@ module.exports = class BillingsDBApi {
       {
         id: data.id || undefined,
 
-        amount: data.amount || null,
+        amount: data.totalAmount || null,
         billing_date: data.billing_date || null,
         status: data.status || null,
         importHash: data.importHash || null,
