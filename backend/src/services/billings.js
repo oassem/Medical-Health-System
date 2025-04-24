@@ -6,7 +6,7 @@ const csv = require('csv-parser');
 const axios = require('axios');
 const config = require('../config');
 const stream = require('stream');
-const { getPrescriptionsForPatient } = require('../prescriptions');
+const { getPrescriptionsForPatient } = require('./prescriptions.js');
 
 module.exports = class BillingsService {
   static async create(data, currentUser) {
