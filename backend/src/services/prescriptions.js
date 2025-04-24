@@ -23,6 +23,14 @@ module.exports = class PrescriptionsService {
     }
   }
 
+   static async getPrescriptionsForPatient(patientId) {
+    try {
+      return await db.Prescriptions.findAll({ where: { patientId } });
+    } catch (error) {
+      throw error;
+    }
+  }
+  
   static async bulkImport(req, res, sendInvitationEmails = true, host) {
     const transaction = await db.sequelize.transaction();
 
