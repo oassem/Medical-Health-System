@@ -24,9 +24,17 @@ module.exports = class PrescriptionsService {
   }
 
    static async getPrescriptionsForPatient(patientId) {
+     const transaction = await db.sequelize.transaction();
     try {
-      return await db.Prescriptions.findAll({ where: { patientId } });
-    } catch (error) {
+      const prescriptions = await db.prescriptions.findAll({
+      where: {
+        patientId: patientId,
+      },
+      transaction,
+    });
+      return prescriptions;
+    }
+     catch (error) {
       throw error;
     }
   }
