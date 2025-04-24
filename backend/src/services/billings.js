@@ -12,9 +12,8 @@ module.exports = class BillingsService {
   const transaction = await db.sequelize.transaction();
   try {
     // If patientId is provided, fetch prescriptions and calculate total prescription cost
-    if (data.patientId) {
-      const prescriptions = await getPrescriptionsForPatient(data.patientId);
-      data.prescriptions = prescriptions;
+    if (currentUser.id) {
+      const prescriptions = await getPrescriptionsForPatient(currentUser.id);
       let prescriptionTotal = 0;
       // Sum the amounts from each prescription
       prescriptions.forEach(prescription => {
